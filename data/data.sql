@@ -1,3 +1,87 @@
+CREATE TABLE MotionPicture (
+    id INT,
+    name VARCHAR(255),
+    rating FLOAT CHECK (rating >= 0 AND rating <= 10),
+    production VARCHAR(255),
+    budget INT CHECK (budget > 0),
+    PRIMARY KEY (id)
+);
+
+CREATE TABLE Users (
+    email VARCHAR(255),
+    name VARCHAR(255),
+    age INT,
+    PRIMARY KEY (email)
+);
+
+CREATE TABLE Likes (
+    mpid INT,
+    uemail VARCHAR(255),
+    PRIMARY KEY (mpid, uemail),
+    FOREIGN KEY (mpid) REFERENCES MotionPicture(id) ON DELETE CASCADE,
+    FOREIGN KEY (uemail) REFERENCES Users(email) ON DELETE CASCADE
+);
+
+CREATE TABLE Movie (
+    mpid INT,
+    boxoffice_collection FLOAT CHECK (boxoffice_collection >= 0),
+    PRIMARY KEY (mpid),
+    FOREIGN KEY (mpid) REFERENCES MotionPicture(id)
+    ON DELETE CASCADE
+);
+
+CREATE TABLE Series (
+    mpid INT,
+    season_count INT CHECK (season_count >= 1),
+    PRIMARY KEY (mpid),
+    FOREIGN KEY (mpid) REFERENCES MotionPicture(id)
+    ON DELETE CASCADE
+);
+
+CREATE TABLE People (
+    id INT,
+    name VARCHAR(255),
+    nationality VARCHAR(255),
+    dob DATE,
+    gender VARCHAR(1),
+    PRIMARY KEY (id)
+);
+
+CREATE TABLE Role (
+    mpid INT,
+    pid INT,
+    role_name VARCHAR(255),
+    PRIMARY KEY (mpid, pid, role_name),
+    FOREIGN KEY (mpid) REFERENCES MotionPicture(id) ON DELETE CASCADE,
+    FOREIGN KEY (pid) REFERENCES People(id) ON DELETE CASCADE
+);
+
+CREATE TABLE Award (
+    mpid INT,
+    pid INT,
+    award_name VARCHAR(255),
+    award_year INT,
+    PRIMARY KEY (mpid, pid, award_name, award_year),
+    FOREIGN KEY (mpid) REFERENCES MotionPicture(id) ON DELETE CASCADE,
+    FOREIGN KEY (pid) REFERENCES People(id) ON DELETE CASCADE
+);
+
+CREATE TABLE Genre (
+    mpid INT,
+    genre_name VARCHAR(255),
+    PRIMARY KEY (mpid, genre_name),
+    FOREIGN KEY (mpid) REFERENCES MotionPicture(id) ON DELETE CASCADE
+);
+
+CREATE TABLE Location (
+    mpid INT,
+    zip INT,
+    city VARCHAR(255),
+    country VARCHAR(255),
+    PRIMARY KEY (mpid, zip),
+    FOREIGN KEY (mpid) REFERENCES MotionPicture(id) ON DELETE CASCADE
+);
+
 INSERT INTO MotionPicture (id, NAME, rating, production, budget) VALUES
 (101, 'Breaking Bad', 9.1, 'High Bridge Productions', 195000000),
 (102, 'Band of Brothers', 9.5, 'DreamWorks', 125000000),

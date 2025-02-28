@@ -93,6 +93,3 @@ class Database:
         """Ensure that the connection is closed when exiting the context."""
         if self.conn:
             self.conn.close()
-
-
-#ahahfbieafgpbwfgisbojfonesvdibj fensd

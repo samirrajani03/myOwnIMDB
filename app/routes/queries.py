@@ -95,14 +95,12 @@ def search_awards():
     # >>>> TODO 6: Find the people who have received more than “k” awards for a single motion picture in the same year. <<<<
     #              List the person `name`, `motion picture name`, `award year` and `award count`.
 
-    query = """SELECT p.name, mp.name, a1.award_year, a1.award_count
-                FROM People p
-                JOIN (SELECT a1.pid, a1.mpid, a1.award_year, COUNT(a1.award_name) AS award_count
-                        FROM Award a1
-                        JOIN Award a2 ON a1.pid = a2.pid AND a1.mpid = a2.mpid AND a1.award_year = a2.award_year AND a1.award_name != a2.award_name
-                        GROUP BY a1.pid) a1 ON p.id = a1.pid
-                JOIN MotionPicture mp ON mp.id = a1.mpid
-                HAVING a1.award_count > %s; """
+    query = """SELECT p.name, mp.name, a.award_year, COUNT(a.award_name) AS award_count
+                FROM Award a
+                JOIN MotionPicture mp ON mp.id = a.mpid
+                JOIN People p ON p.id = a.pid
+                GROUP BY mp.id, p.id, a.award_year
+                HAVING award_count > %s; """
 
     with Database() as db:
         results = db.execute(query, (k,))
@@ -209,7 +207,8 @@ def top_thriller_movies_boston():
     query = """SELECT DISTINCT mp.name, mp.rating 
                 FROM location l
                 JOIN Genre g on l.mpid = g.mpid
-                JOIN MotionPicture mp on mp.id = l.mpid
+                JOIN Movie m on m.mpid = l.mpid
+                JOIN MotionPicture mp on mp.id = m.mpid
                 WHERE l.mpid IN (SELECT l.mpid
                                     FROM location l
                                     GROUP BY l.mpid
@@ -294,7 +293,8 @@ def movies_higher_than_comedy_avg():
                 WHERE mp.rating > (SELECT AVG(mp.rating) as avg_rating
                                     FROM Genre g
                                     JOIN MotionPicture mp on mp.id = g.mpid
-                                    WHERE g.genre_name = 'Comedy'); """
+                                    WHERE g.genre_name = 'Comedy')
+                ORDER BY mp.rating DESC; """
 
     with Database() as db:
         results = db.execute(query)
